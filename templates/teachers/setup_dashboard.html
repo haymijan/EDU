@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    
+    <div class="flex justify-between items-center mb-8 border-b border-gray-200 pb-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">এইচআর ও শিক্ষক সেটআপ (HR Setup)</h1>
+            <p class="text-sm text-gray-500">শিক্ষক ও স্টাফদের পদবী, বিভাগ এবং নিয়োগের ধরন পরিচালনা করুন।</p>
+        </div>
+        <a href="{% url 'teachers:teacher_list' %}" class="bg-gray-100 text-gray-600 px-5 py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition">
+            &larr; শিক্ষক তালিকায় যান
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 flex flex-col items-center text-center hover:shadow-md transition">
+            <div class="w-16 h-16 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-3xl mb-4">
+                🎖️
+            </div>
+            <h2 class="text-lg font-bold text-gray-800 mb-1">শিক্ষক ও স্টাফ পদবী</h2>
+            <p class="text-xs text-gray-500 mb-4">যেমন: Principal, Senior Teacher, Lecturer</p>
+            <div class="flex flex-wrap gap-2 justify-center mb-4">
+                {% for des in designations %}
+                    <span class="px-3 py-1 bg-purple-50 text-purple-700 text-xs font-bold rounded-full border border-purple-100">{{ des.name }}</span>
+                {% empty %}
+                    <span class="text-xs text-red-400">কোনো পদবী নেই</span>
+                {% endfor %}
+            </div>
+            <button onclick="document.getElementById('addDesModal').classList.remove('hidden')" class="mt-auto w-full border-2 border-purple-600 text-purple-700 py-2 rounded-xl font-bold hover:bg-purple-50 transition">
+                + পদবী যোগ করুন
+            </button>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-6 flex flex-col items-center text-center hover:shadow-md transition">
+            <div class="w-16 h-16 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center text-3xl mb-4">
+                🏢
+            </div>
+            <h2 class="text-lg font-bold text-gray-800 mb-1">বিভাগ (Department)</h2>
+            <p class="text-xs text-gray-500 mb-4">যেমন: Science Dept, Accounts, Admin</p>
+            <div class="flex flex-wrap gap-2 justify-center mb-4">
+                {% for dept in departments %}
+                    <span class="px-3 py-1 bg-orange-50 text-orange-700 text-xs font-bold rounded-full border border-orange-100">{{ dept.name }}</span>
+                {% empty %}
+                    <span class="text-xs text-red-400">কোনো বিভাগ নেই</span>
+                {% endfor %}
+            </div>
+            <button onclick="document.getElementById('addDeptModal').classList.remove('hidden')" class="mt-auto w-full border-2 border-orange-600 text-orange-700 py-2 rounded-xl font-bold hover:bg-orange-50 transition">
+                + বিভাগ যোগ করুন
+            </button>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 flex flex-col items-center text-center hover:shadow-md transition">
+            <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mb-4">
+                📝
+            </div>
+            <h2 class="text-lg font-bold text-gray-800 mb-1">নিয়োগের ধরন (Staff Type)</h2>
+            <p class="text-xs text-gray-500 mb-4">যেমন: Permanent, Contractual, Guest</p>
+            <div class="flex flex-wrap gap-2 justify-center mb-4">
+                {% for stype in staff_types %}
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100">{{ stype.name }}</span>
+                {% empty %}
+                    <span class="text-xs text-red-400">কোনো ধরন নেই</span>
+                {% endfor %}
+            </div>
+            <button onclick="document.getElementById('addStaffTypeModal').classList.remove('hidden')" class="mt-auto w-full border-2 border-emerald-600 text-emerald-700 py-2 rounded-xl font-bold hover:bg-emerald-50 transition">
+                + নিয়োগের ধরন যোগ করুন
+            </button>
+        </div>
+
+    </div>
+
+    <div id="addDesModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm h-full w-full hidden z-50 flex justify-center items-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+            <div class="flex justify-between items-center p-5 border-b bg-purple-50">
+                <h2 class="text-lg font-bold text-purple-900">নতুন পদবী তৈরি</h2>
+                <button onclick="document.getElementById('addDesModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500">&times;</button>
+            </div>
+            <form hx-post="{% url 'teachers:add_designation_quick' %}" hx-swap="none" hx-on::after-request="window.location.reload()" class="p-6">
+                {% csrf_token %}
+                <label class="block text-sm font-semibold mb-2">পদবীর নাম</label>
+                <input type="text" name="name" placeholder="যেমন: Senior Teacher" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 mb-4" required>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700">তৈরি করুন</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addDeptModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm h-full w-full hidden z-50 flex justify-center items-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+            <div class="flex justify-between items-center p-5 border-b bg-orange-50">
+                <h2 class="text-lg font-bold text-orange-900">নতুন বিভাগ তৈরি</h2>
+                <button onclick="document.getElementById('addDeptModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500">&times;</button>
+            </div>
+            <form hx-post="{% url 'teachers:add_department_quick' %}" hx-swap="none" hx-on::after-request="window.location.reload()" class="p-6">
+                {% csrf_token %}
+                <label class="block text-sm font-semibold mb-2">বিভাগের নাম</label>
+                <input type="text" name="name" placeholder="যেমন: Science Dept" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 mb-4" required>
+                <button type="submit" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700">তৈরি করুন</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addStaffTypeModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm h-full w-full hidden z-50 flex justify-center items-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+            <div class="flex justify-between items-center p-5 border-b bg-emerald-50">
+                <h2 class="text-lg font-bold text-emerald-900">নতুন নিয়োগের ধরন তৈরি</h2>
+                <button onclick="document.getElementById('addStaffTypeModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500">&times;</button>
+            </div>
+            <form hx-post="{% url 'teachers:add_staff_type_quick' %}" hx-swap="none" hx-on::after-request="window.location.reload()" class="p-6">
+                {% csrf_token %}
+                <label class="block text-sm font-semibold mb-2">নিয়োগের ধরন</label>
+                <input type="text" name="name" placeholder="যেমন: Permanent" class="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 mb-4" required>
+                <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700">তৈরি করুন</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

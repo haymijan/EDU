@@ -1,0 +1,74 @@
+<tr class="bg-indigo-50/30 animate-in fade-in duration-300">
+    <td colspan="5" class="p-4 border-y-2 border-indigo-200">
+        <form hx-post="{% url 'academics:update_section' section.id %}" hx-target="closest tr" hx-swap="outerHTML" class="bg-white p-5 rounded-xl shadow-sm border border-indigo-100">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">শ্রেণি ও ক্যাম্পাস</label>
+                    <select name="classroom_id" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                        {% for cls in classrooms %}
+                            <option value="{{ cls.id }}" {% if cls.id == section.classroom_id %}selected{% endif %}>
+                                {{ cls.name }} - {{ cls.campus.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">শাখার নাম</label>
+                    <input type="text" name="name" value="{{ section.name }}" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">গ্রুপ (Group)</label>
+                    <select name="group_id" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">-- গ্রুপ নির্বাচন করুন --</option>
+                        {% for grp in groups %}
+                            <option value="{{ grp.id }}" {% if grp.id == section.group_id %}selected{% endif %}>{{ grp.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">শিফট (Shift)</label>
+                    <select name="shift_id" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">-- শিফট নির্বাচন করুন --</option>
+                        {% for shft in shifts %}
+                            <option value="{{ shft.id }}" {% if shft.id == section.shift_id %}selected{% endif %}>{{ shft.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">আসন সংখ্যা</label>
+                    <input type="number" name="capacity" value="{{ section.capacity }}" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">রুম নম্বর</label>
+                    <input type="text" name="room_number" value="{{ section.room_number|default:'' }}" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-indigo-600 uppercase mb-1">ক্লাস টিচার</label>
+                    <select name="class_teacher_id" class="w-full border border-indigo-200 bg-indigo-50 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">-- শিক্ষক নির্বাচন করুন --</option>
+                        {% for teacher in teachers %}
+                            <option value="{{ teacher.id }}" {% if teacher.id == section.class_teacher_id %}selected{% endif %}>
+                                {{ teacher.user.first_name }} {{ teacher.user.last_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="window.location.reload()" 
+                            class="px-4 py-2 text-xs font-bold text-gray-500 bg-gray-50 rounded-lg hover:bg-gray-100 transition border border-gray-200">
+                        বাতিল
+                    </button>
+                    <button type="submit" 
+                            class="px-5 py-2 text-xs font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition">
+                        আপডেট
+                    </button>
+                </div>
+            </div>
+        </form>
+    </td>
+</tr>

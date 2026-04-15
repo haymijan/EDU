@@ -1,0 +1,84 @@
+<tr class="bg-purple-50/30 animate-in fade-in duration-300">
+    <td colspan="5" class="p-6 border-y-2 border-purple-200">
+        <form hx-post="{% url 'teachers:update_teacher' teacher.id %}" hx-target="closest tr" hx-swap="outerHTML" enctype="multipart/form-data" class="bg-white p-6 rounded-2xl shadow-sm border border-purple-100">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">এমপ্লয়ী আইডি</label>
+                    <input type="text" name="employee_id" value="{{ teacher.employee_id }}" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">পদবী (Designation)</label>
+                    <select name="designation_id" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="">-- নির্বাচন করুন --</option>
+                        {% for des in designations %}
+                            <option value="{{ des.id }}" {% if des.id == teacher.designation_id %}selected{% endif %}>{{ des.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">বিভাগ (Department)</label>
+                    <select name="department_id" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="">-- নির্বাচন করুন --</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.id }}" {% if dept.id == teacher.department_id %}selected{% endif %}>{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-5">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">প্রথম নাম</label>
+                    <input type="text" name="first_name" value="{{ teacher.user.first_name }}" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">শেষ নাম</label>
+                    <input type="text" name="last_name" value="{{ teacher.user.last_name }}" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">জেন্ডার</label>
+                    <select name="gender" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="male" {% if teacher.gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if teacher.gender == 'female' %}selected{% endif %}>Female</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">শিফট (Shift)</label>
+                    <select name="shift_id" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="">-- নির্বাচন করুন --</option>
+                        {% for sh in shifts %}
+                            <option value="{{ sh.id }}" {% if sh.id == teacher.shift_id %}selected{% endif %}>{{ sh.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">মোবাইল নম্বর</label>
+                    <input type="text" name="phone_number" value="{{ teacher.phone_number }}" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">বেতন (Salary)</label>
+                    <input type="number" name="salary" value="{{ teacher.salary }}" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">ছবি পরিবর্তন</label>
+                    <input type="file" name="profile_picture" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-50 file:text-purple-700">
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">ঠিকানা</label>
+                <input type="text" name="address" value="{{ teacher.address }}" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button type="button" onclick="window.location.reload()" class="px-6 py-2.5 text-sm font-bold text-gray-500 bg-gray-50 rounded-xl hover:bg-gray-100 transition">বাতিল</button>
+                <button type="submit" class="px-8 py-2.5 text-sm font-bold text-white bg-purple-600 rounded-xl hover:bg-purple-700 shadow-md transition">আপডেট করুন</button>
+            </div>
+        </form>
+    </td>
+</tr>

@@ -1,0 +1,5 @@
+{% for section in sections %}
+    {% include 'academics/partials/section_row.html' %}
+{% empty %}
+    <tr><td colspan="5" class="px-6 py-10 text-center text-gray-400">কোনো শাখা পাওয়া যায়নি।</td></tr>
+{% endfor %}

@@ -1,0 +1,49 @@
+<tr class="hover:bg-gray-50 transition duration-150 text-sm border-b border-gray-100">
+    <td class="px-6 py-4">
+        {% if teacher.user.profile_picture %}
+            <img src="{{ teacher.user.profile_picture.url }}" class="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm">
+        {% else %}
+            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold border border-purple-200">
+                {{ teacher.user.first_name|first|upper }}
+            </div>
+        {% endif %}
+    </td>
+    
+    <td class="px-6 py-4">
+        <div class="font-bold text-gray-800">{{ teacher.user.first_name }} {{ teacher.user.last_name }}</div>
+        <div class="text-xs text-purple-600 font-semibold">ID: {{ teacher.employee_id }} | {{ teacher.get_gender_display }}</div>
+    </td>
+    
+    <td class="px-6 py-4">
+        <div class="font-medium text-gray-800">{{ teacher.designation }}</div>
+        <div class="flex items-center space-x-2 mt-1">
+            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                {{ teacher.get_shift_display }}
+            </span>
+            <span class="text-xs text-gray-500">{{ teacher.qualification }}</span>
+        </div>
+    </td>
+    
+    <td class="px-6 py-4">
+        <div class="text-sm text-gray-600">{{ teacher.phone_number|default:"-" }}</div>
+        <div class="text-xs text-gray-400 truncate max-w-[150px]">{{ teacher.address|default:"-" }}</div>
+    </td>
+    
+    <td class="px-6 py-4 font-bold text-emerald-600">
+        ৳ {{ teacher.salary }}
+    </td>
+    
+    <td class="px-6 py-4 text-right">
+        <div class="flex space-x-2 justify-end">
+            <button hx-get="{% url 'teachers:edit_teacher' teacher.id %}" hx-target="closest tr" hx-swap="outerHTML" class="text-xs font-medium bg-blue-50 text-blue-600 px-3 py-1.5 rounded hover:bg-blue-600 hover:text-white transition shadow-sm">
+                Edit
+            </button>
+            <form hx-post="{% url 'teachers:delete_teacher' teacher.id %}" hx-target="closest tr" hx-swap="outerHTML" hx-confirm="মুছে ফেলতে চান?" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="text-xs font-medium bg-red-50 text-red-600 px-3 py-1.5 rounded hover:bg-red-600 hover:text-white transition shadow-sm">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </td>
+</tr>

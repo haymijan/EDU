@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">শাখা ব্যবস্থাপনা (Section Management)</h1>
+            <p class="text-sm text-gray-500">ক্লাসের বিভিন্ন শাখা, গ্রুপ এবং শিফট পরিচালনা করুন।</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'academics:academic_setup' %}" class="bg-white border-2 border-indigo-600 text-indigo-700 px-5 py-2.5 rounded-xl font-bold hover:bg-indigo-50 transition shadow-sm flex items-center">
+                ⚙️ Academic Setup
+            </a>
+            <button onclick="document.getElementById('addSectionModal').classList.remove('hidden')" 
+                    class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition flex items-center shadow-lg shadow-indigo-100">
+                নতুন শাখা যুক্ত করুন
+            </button>
+        </div>
+    </div>
+
+    <form hx-get="{% url 'academics:filter_sections' %}" hx-target="#section-table-body" hx-swap="innerHTML" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+        <div class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-grow w-full">
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">শ্রেণি অনুযায়ী খুঁজুন</label>
+                <select name="classroom" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="all">সকল শ্রেণি (All Classes)</option>
+                    {% for cls in classrooms %}
+                        <option value="{{ cls.id }}">{{ cls.name }} - {{ cls.campus.name|default:"N/A" }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="bg-teal-600 text-white px-8 py-2.5 rounded-lg text-sm font-bold hover:bg-teal-700 transition shadow-sm w-full md:w-auto">
+                ফিল্টার করুন
+            </button>
+        </div>
+    </form>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-xs font-bold text-gray-400 bg-gray-50/50 border-b uppercase tracking-widest">
+                    <th class="px-6 py-4">শ্রেণি ও শাখা</th>
+                    <th class="px-6 py-4">গ্রুপ ও শিফট</th>
+                    <th class="px-6 py-4">রুম ও আসন</th>
+                    <th class="px-6 py-4">ক্লাস টিচার</th>
+                    <th class="px-6 py-4 text-right">অ্যাকশন</th>
+                </tr>
+            </thead>
+            <tbody id="section-table-body" class="divide-y divide-gray-50">
+                {% include 'academics/partials/section_table_body.html' %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="addSectionModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 flex justify-center items-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+            <div class="flex justify-between items-center p-6 border-b bg-indigo-50/30">
+                <h2 class="text-xl font-bold text-indigo-900">নতুন শাখা নিবন্ধন</h2>
+                <button onclick="document.getElementById('addSectionModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500 transition">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+            <form hx-post="{% url 'academics:add_section_htmx' %}" hx-target="#section-table-body" hx-swap="afterbegin" 
+                  hx-on::after-request="if(event.detail.successful) { this.reset(); document.getElementById('addSectionModal').classList.add('hidden'); }" 
+                  class="p-8 space-y-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">শ্রেণি (Classroom) *</label>
+                        <select name="classroom_id" class="w-full border border-gray-200 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" required>
+                            <option value="">শ্রেণি নির্বাচন করুন</option>
+                            {% for cls in classrooms %}
+                                <option value="{{ cls.id }}">{{ cls.name }} - {{ cls.campus.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">শাখার নাম (Section Name) *</label>
+                        <input type="text" name="name" placeholder="যেমন: Padma, Meghna" class="w-full border border-gray-200 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">গ্রুপ (Group)</label>
+                        <select name="group_id" class="w-full border border-gray-200 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">-- নির্বাচন করুন --</option>
+                            {% for grp in groups %}
+                                <option value="{{ grp.id }}">{{ grp.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">শিফট (Shift)</label>
+                        <select name="shift_id" class="w-full border border-gray-200 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">-- নির্বাচন করুন --</option>
+                            {% for shft in shifts %}
+                                <option value="{{ shft.id }}">{{ shft.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">আসন সংখ্যা</label>
+                        <input type="number" name="capacity" value="50" class="w-full border border-gray-200 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-gray-700">রুম নম্বর</label>
+                        <input type="text" name="room_number" placeholder="302" class="w-full border border-gray-200 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1 text-indigo-600">ক্লাস টিচার</label>
+                        <select name="class_teacher_id" class="w-full border border-indigo-200 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 bg-indigo-50">
+                            <option value="">নির্বাচন করুন</option>
+                            {% for teacher in teachers %}
+                                <option value="{{ teacher.id }}">{{ teacher.user.first_name }} {{ teacher.user.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition mt-4 shadow-lg shadow-indigo-100">
+                    শাখা নিবন্ধন সম্পন্ন করুন
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

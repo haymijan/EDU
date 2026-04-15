@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">শ্রেণি ব্যবস্থাপনা (Classroom Management)</h1>
+            <p class="text-sm text-gray-500">প্রতিষ্ঠানের সকল শ্রেণির তালিকা ও ক্যাম্পাস ভিত্তিক তথ্য।</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'academics:academic_setup' %}" class="bg-white border-2 border-indigo-600 text-indigo-700 px-5 py-2.5 rounded-xl font-bold hover:bg-indigo-50 transition shadow-sm flex items-center">
+                ⚙️ Academic Setup
+            </a>
+            <button onclick="document.getElementById('addClassModal').classList.remove('hidden')" 
+                    class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition flex items-center shadow-lg shadow-blue-100">
+                নতুন শ্রেণি যুক্ত করুন
+            </button>
+        </div>
+    </div>
+
+    <form hx-get="{% url 'academics:filter_classrooms' %}" hx-target="#classroom-table-body" hx-swap="innerHTML" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">শ্রেণির নাম দিয়ে খুঁজুন</label>
+                <input type="text" name="search_query" placeholder="যেমন: Play..." class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+            
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">ক্যাম্পাস ফিল্টার</label>
+                <select name="campus" class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    <option value="all">সকল ক্যাম্পাস</option>
+                    {% for camp in campuses %}
+                        <option value="{{ camp.id }}">{{ camp.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="flex items-end">
+                <button type="submit" class="bg-teal-600 text-white px-8 py-2.5 rounded-lg text-sm font-bold hover:bg-teal-700 transition shadow-sm w-full">
+                    ফিল্টার করুন
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-xs font-bold text-gray-400 bg-gray-50/50 border-b uppercase tracking-widest">
+                    <th class="px-6 py-4">শ্রেণির নাম</th>
+                    <th class="px-6 py-4">ক্যাম্পাস (Campus)</th>
+                    <th class="px-6 py-4">বিবরণ (Description)</th>
+                    <th class="px-6 py-4 text-right">অ্যাকশন</th>
+                </tr>
+            </thead>
+            <tbody id="classroom-table-body" class="divide-y divide-gray-50">
+                {% include 'academics/partials/classroom_table_body.html' %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="addClassModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 flex justify-center items-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+            <div class="flex justify-between items-center p-6 border-b bg-blue-50/30">
+                <h2 class="text-xl font-bold text-blue-900">নতুন শ্রেণি যুক্ত করুন</h2>
+                <button onclick="document.getElementById('addClassModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+            <form hx-post="{% url 'academics:add_classroom_htmx' %}" hx-target="#classroom-table-body" hx-swap="afterbegin" 
+                  hx-on::after-request="if(event.detail.successful) { this.reset(); document.getElementById('addClassModal').classList.add('hidden'); }" class="p-8 space-y-5">
+                {% csrf_token %}
+                
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-blue-700">ক্যাম্পাস নির্বাচন করুন *</label>
+                    <select name="campus_id" class="w-full border border-blue-200 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-blue-50" required>
+                        <option value="">-- নির্বাচন করুন --</option>
+                        {% for camp in campuses %}
+                            <option value="{{ camp.id }}">{{ camp.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-700">শ্রেণির নাম (Class Name) *</label>
+                    <input type="text" name="name" placeholder="যেমন: Class 10" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-600">বিবরণ (Description)</label>
+                    <textarea name="description" rows="2" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition mt-4 shadow-lg shadow-blue-100">
+                    সেভ করুন
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

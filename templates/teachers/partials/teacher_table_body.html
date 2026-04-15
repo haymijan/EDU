@@ -1,0 +1,5 @@
+{% for teacher in teachers %}
+    {% include 'teachers/partials/teacher_row.html' %}
+{% empty %}
+    <tr><td colspan="4" class="px-6 py-10 text-center text-gray-400">কোনো তথ্য পাওয়া যায়নি।</td></tr>
+{% endfor %}

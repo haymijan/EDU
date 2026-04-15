@@ -1,0 +1,59 @@
+<tr class="hover:bg-gray-50 transition duration-150 text-sm border-b border-gray-100">
+    <td class="px-4 py-3">
+        {% if student.user.profile_picture %}
+            <img src="{{ student.user.profile_picture.url }}" alt="Profile" class="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm">
+        {% else %}
+            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500 font-bold border border-indigo-200">
+                {{ student.user.first_name|first|upper }}
+            </div>
+        {% endif %}
+    </td>
+    
+    <td class="px-4 py-3 font-semibold text-gray-800">
+        {{ student.roll_number }}
+    </td>
+    
+    <td class="px-4 py-3">
+        <div class="font-semibold text-indigo-600">{{ student.user.first_name }} {{ student.user.last_name }}</div>
+        <div class="text-xs text-gray-500 capitalize">জেন্ডার: {{ student.get_gender_display }}</div>
+    </td>
+    
+    <td class="px-4 py-3">
+        {% if student.classroom %}
+            <div class="font-medium text-gray-800">{{ student.classroom.name }}</div>
+            <div class="text-xs text-gray-500">শাখা: {{ student.section.name|default:"-" }}</div>
+        {% else %}
+            <span class="text-red-400 text-xs italic">বরাদ্দ করা হয়নি</span>
+        {% endif %}
+    </td>
+    
+    <td class="px-4 py-3 text-gray-600 font-medium">
+        {{ student.guardian_phone|default:"-" }}
+    </td>
+    
+    <td class="px-4 py-3 text-gray-500 truncate max-w-[150px]" title="{{ student.guardian_address }}">
+        {{ student.guardian_address|default:"N/A" }}
+    </td>
+    
+    <td class="px-4 py-3 text-right">
+        <div class="flex space-x-2 justify-end">
+            <button hx-get="{% url 'students:edit_student' student.id %}" 
+                    hx-target="closest tr" 
+                    hx-swap="outerHTML" 
+                    class="text-xs font-medium bg-blue-50 text-blue-600 px-3 py-1.5 rounded hover:bg-blue-600 hover:text-white transition shadow-sm">
+                Edit
+            </button>
+
+            <form hx-post="{% url 'students:delete_student' student.id %}" 
+                  hx-target="closest tr" 
+                  hx-swap="outerHTML" 
+                  hx-confirm="আপনি কি নিশ্চিত যে এই শিক্ষার্থীর তথ্য মুছে ফেলতে চান?" 
+                  style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="text-xs font-medium bg-red-50 text-red-600 px-3 py-1.5 rounded hover:bg-red-600 hover:text-white transition shadow-sm">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </td>
+</tr>

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">বিষয় ব্যবস্থাপনা (Subject Management)</h1>
+            <p class="text-sm text-gray-500">প্রতিষ্ঠানে পাঠদানকৃত সকল বিষয়ের তালিকা।</p>
+        </div>
+        <button onclick="document.getElementById('addSubjectModal').classList.remove('hidden')" 
+                class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition flex items-center shadow-lg">
+            নতুন বিষয় যুক্ত করুন
+        </button>
+    </div>
+
+    <form hx-get="{% url 'academics:filter_subjects' %}" hx-target="#subject-table-body" hx-swap="innerHTML" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-8">
+        <div class="flex gap-4">
+            <div class="flex-grow">
+                <input type="text" name="search_query" placeholder="বিষয়ের নাম বা কোড দিয়ে খুঁজুন..." 
+                       class="w-full border border-gray-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <button type="submit" class="bg-teal-600 text-white px-8 py-2.5 rounded-lg text-sm font-bold hover:bg-teal-700 transition shadow-sm">
+                ফিল্টার
+            </button>
+        </div>
+    </form>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-xs font-bold text-gray-400 bg-gray-50/50 border-b uppercase tracking-widest">
+                    <th class="px-6 py-4">বিষয়ের কোড</th>
+                    <th class="px-6 py-4">বিষয়ের নাম</th>
+                    <th class="px-6 py-4 text-right">অ্যাকশন</th>
+                </tr>
+            </thead>
+            <tbody id="subject-table-body" class="divide-y divide-gray-50">
+                {% include 'academics/partials/subject_table_body.html' %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="addSubjectModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 flex justify-center items-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-center p-6 border-b bg-indigo-50/30">
+                <h2 class="text-xl font-bold text-indigo-900">নতুন বিষয় যুক্ত করুন</h2>
+                <button onclick="document.getElementById('addSubjectModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+            <form hx-post="{% url 'academics:add_subject_htmx' %}" hx-target="#subject-table-body" hx-swap="afterbegin" 
+                hx-on::after-request="if(event.detail.successful) { this.reset(); document.getElementById('addSubjectModal').classList.add('hidden'); }" class="p-8 space-y-5">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">শ্রেণি (Classroom) *</label>
+                        <select name="classroom_id" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 bg-indigo-50" required>
+                            <option value="">-- শ্রেণি নির্বাচন করুন --</option>
+                            {% for cls in classrooms %}
+                                <option value="{{ cls.id }}">{{ cls.name }} - {{ cls.campus.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">বিষয়ের ধরন</label>
+                        <select name="subject_type" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="core">Core / Mandatory</option>
+                            <option value="elective">Elective / Optional</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">বিষয়ের নাম (Subject Name) *</label>
+                        <input type="text" name="name" placeholder="যেমন: Mathematics" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">বিষয় কোড (Subject Code) *</label>
+                        <input type="text" name="code" placeholder="যেমন: 109" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">পূর্ণমান (Full Marks)</label>
+                        <input type="number" name="full_marks" value="100" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">পাস নম্বর (Pass Marks)</label>
+                        <input type="number" name="pass_marks" value="33" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition mt-4 shadow-lg shadow-indigo-100">
+                    সাবজেক্ট নিবন্ধন করুন
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% for student in students %}
+    {% include 'students/partials/student_row.html' %}
+{% empty %}
+    <tr>
+        <td colspan="7" class="px-6 py-10 text-center text-gray-400 font-medium">
+            এই ফিল্টারের অধীনে কোনো শিক্ষার্থীর তথ্য পাওয়া যায়নি।
+        </td>
+    </tr>
+{% endfor %}

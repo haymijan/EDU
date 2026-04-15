@@ -1,0 +1,5 @@
+{% for classroom in classrooms %}
+    {% include 'academics/partials/classroom_row.html' %}
+{% empty %}
+    <tr><td colspan="3" class="px-6 py-10 text-center text-gray-400">কোনো শ্রেণি পাওয়া যায়নি।</td></tr>
+{% endfor %}

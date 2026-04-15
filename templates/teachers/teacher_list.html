@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">শিক্ষক ও স্টাফ তালিকা (Staff Directory)</h1>
+            <p class="text-sm text-gray-500">আপনার প্রতিষ্ঠানের সকল শিক্ষক ও কর্মচারীদের তথ্য পরিচালনা করুন।</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'teachers:hr_setup' %}" class="bg-white border-2 border-purple-600 text-purple-700 px-5 py-2.5 rounded-xl font-bold hover:bg-purple-50 transition shadow-sm flex items-center">
+                ⚙️ HR Setup
+            </a>
+            <button onclick="document.getElementById('addTeacherModal').classList.remove('hidden')" 
+                    class="bg-purple-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-purple-700 transition flex items-center shadow-lg shadow-purple-100">
+                + নতুন শিক্ষক যোগ করুন
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="text-xs font-bold text-gray-400 bg-gray-50/50 border-b uppercase tracking-widest">
+                    <th class="px-6 py-4">ছবি</th>
+                    <th class="px-6 py-4">নাম ও পদবী</th>
+                    <th class="px-6 py-4">বিভাগ ও আইডি</th>
+                    <th class="px-6 py-4">যোগাযোগ</th>
+                    <th class="px-6 py-4 text-right">অ্যাকশন</th>
+                </tr>
+            </thead>
+            <tbody id="teacher-table-body" class="divide-y divide-gray-50">
+                {% include 'teachers/partials/teacher_table_body.html' %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="addTeacherModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 flex justify-center items-center p-4">
+        <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+            <div class="flex justify-between items-center p-6 border-b bg-purple-50/30">
+                <h2 class="text-xl font-bold text-purple-900">নতুন শিক্ষক নিবন্ধন (Staff Registration)</h2>
+                <button onclick="document.getElementById('addTeacherModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500 transition text-2xl">&times;</button>
+            </div>
+            
+            <form hx-post="{% url 'teachers:add_teacher_htmx' %}" hx-target="#teacher-table-body" hx-swap="afterbegin" 
+                  hx-on::after-request="if(event.detail.successful) { this.reset(); document.getElementById('addTeacherModal').classList.add('hidden'); }" 
+                  class="p-6 md:p-8 space-y-8 h-[75vh] overflow-y-auto custom-scrollbar">
+                {% csrf_token %}
+                
+                <div class="bg-purple-50/50 p-5 rounded-2xl border border-purple-100">
+                    <h3 class="text-sm font-bold text-purple-800 uppercase tracking-wider mb-4 border-b border-purple-200 pb-2">১. অফিসিয়াল ও প্রফেশনাল তথ্য</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">এমপ্লয়ী আইডি (ID) *</label>
+                            <input type="text" name="employee_id" placeholder="T-101" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-purple-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">পদবী (Designation) *</label>
+                            <select name="designation_id" class="w-full border p-2.5 rounded-xl bg-white outline-none focus:ring-2 focus:ring-purple-500" required>
+                                <option value="">-- নির্বাচন করুন --</option>
+                                {% for des in designations %}
+                                    <option value="{{ des.id }}">{{ des.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">বিভাগ (Department) *</label>
+                            <select name="department_id" class="w-full border p-2.5 rounded-xl bg-white outline-none focus:ring-2 focus:ring-purple-500" required>
+                                <option value="">-- নির্বাচন করুন --</option>
+                                {% for dept in departments %}
+                                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-5">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">নিয়োগের ধরন</label>
+                            <select name="staff_type_id" class="w-full border p-2.5 rounded-xl bg-white outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="">-- নির্বাচন করুন --</option>
+                                {% for st in staff_types %}
+                                    <option value="{{ st.id }}">{{ st.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">শিক্ষাগত যোগ্যতা</label>
+                            <input type="text" name="qualification" placeholder="MA in English, B.Ed" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">২. ব্যক্তিগত ও দায়িত্ব সংক্রান্ত তথ্য</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">প্রথম নাম *</label>
+                                <input type="text" name="first_name" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-purple-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">শেষ নাম *</label>
+                                <input type="text" name="last_name" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-purple-500" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">জেন্ডার</label>
+                                <select name="gender" class="w-full border p-2.5 rounded-xl bg-white outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">রক্তের গ্রুপ</label>
+                                <select name="blood_group_id" class="w-full border p-2.5 rounded-xl bg-white outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="">-- অজানা --</option>
+                                    {% for bg in blood_groups %}
+                                        <option value="{{ bg.id }}">{{ bg.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-indigo-600 mb-1">শিফট (Shift) *</label>
+                            <select name="shift_id" class="w-full border border-indigo-200 p-2.5 rounded-xl bg-indigo-50 outline-none focus:ring-2 focus:ring-indigo-500" required>
+                                <option value="">-- শিফট নির্বাচন করুন --</option>
+                                {% for sh in shifts %}
+                                    <option value="{{ sh.id }}">{{ sh.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">বেতন (Gross Salary)</label>
+                            <input type="number" name="salary" value="0.00" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">মোবাইল নম্বর *</label>
+                            <input type="text" name="phone_number" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-purple-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">ছবি আপলোড</label>
+                            <input type="file" name="profile_picture" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-purple-50 file:text-purple-700">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Username *</label>
+                                <input type="text" name="username" class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-purple-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Password *</label>
+                                <input type="password" name="password" class="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-purple-500" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">বর্তমান ঠিকানা</label>
+                            <textarea name="address" rows="4" class="w-full border p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" onclick="document.getElementById('addTeacherModal').classList.add('hidden')" class="px-6 py-3 font-bold text-gray-500 bg-white border border-gray-300 rounded-xl hover:bg-gray-100 transition">বাতিল</button>
+                    <button type="submit" class="px-10 py-3 font-bold text-white bg-purple-600 rounded-xl hover:bg-purple-700 shadow-lg shadow-purple-200 transition">নিবন্ধন সম্পন্ন করুন</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

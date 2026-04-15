@@ -1,0 +1,19 @@
+<tr class="bg-indigo-50/30 animate-in fade-in duration-300">
+    <td colspan="3" class="p-4 border-y-2 border-indigo-200">
+        <form hx-post="{% url 'academics:update_subject' subject.id %}" hx-target="closest tr" hx-swap="outerHTML" class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+            {% csrf_token %}
+            <div class="flex-1">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">বিষয়ের নাম</label>
+                <input type="text" name="name" value="{{ subject.name }}" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div class="w-32">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">কোড</label>
+                <input type="text" name="code" value="{{ subject.code }}" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div class="flex items-end space-x-2 pt-4">
+                <button type="button" onclick="window.location.reload()" class="px-4 py-2 text-xs font-bold text-gray-500 bg-gray-50 rounded-lg hover:bg-gray-100">বাতিল</button>
+                <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md">সেভ</button>
+            </div>
+        </form>
+    </td>
+</tr>

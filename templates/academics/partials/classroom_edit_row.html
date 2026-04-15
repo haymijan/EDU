@@ -1,0 +1,38 @@
+<tr class="bg-blue-50/30 animate-in fade-in duration-300">
+    <td colspan="4" class="p-4 border-y-2 border-blue-200">
+        <form hx-post="{% url 'academics:update_classroom' classroom.id %}" hx-target="closest tr" hx-swap="outerHTML" class="bg-white p-5 rounded-xl shadow-sm border border-blue-100">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                
+                <div class="md:col-span-3 w-full">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">শ্রেণির নাম</label>
+                    <input type="text" name="name" value="{{ classroom.name }}" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="md:col-span-3 w-full">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">ক্যাম্পাস</label>
+                    <select name="campus_id" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                        {% for camp in campuses %}
+                            <option value="{{ camp.id }}" {% if classroom.campus_id == camp.id %}selected{% endif %}>{{ camp.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="md:col-span-4 w-full">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">বিবরণ</label>
+                    <input type="text" name="description" value="{{ classroom.description|default:'' }}" class="w-full border border-gray-200 p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div class="md:col-span-2 flex justify-end space-x-2">
+                    <button type="button" onclick="window.location.reload()" class="px-3 py-2 text-xs font-bold text-gray-500 bg-gray-50 rounded-lg hover:bg-gray-100 transition border border-gray-200">
+                        বাতিল
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition">
+                        আপডেট
+                    </button>
+                </div>
+                
+            </div>
+        </form>
+    </td>
+</tr>

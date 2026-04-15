@@ -1,0 +1,5 @@
+{% for subject in subjects %}
+    {% include 'academics/partials/subject_row.html' %}
+{% empty %}
+    <tr><td colspan="3" class="px-6 py-10 text-center text-gray-400">কোনো বিষয় পাওয়া যায়নি।</td></tr>
+{% endfor %}
